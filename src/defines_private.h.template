@@ -1,0 +1,44 @@
+#ifndef TINYWATCHY_DEFINES_PRIVATE_H
+#define TINYWATCHY_DEFINES_PRIVATE_H
+
+#define WIFI_SSID ""
+#define WIFI_PASS ""
+#define TIMEZONE "GMT" 
+
+#define SLEEP_START 23 //poprawiono przechodzenie przez północ
+#define SLEEP_END 5
+
+/*
+ * Automatic time update configuration
+ * WAKEUP_INTERVAL_MINUTES: interval for automatic wakeup to update display (during wake hours only)
+ */
+#define WAKEUP_INTERVAL_MINUTES 5  // Wake up every 5 minutes to update time display
+
+/*
+ * Automatic NTP synchronization configuration
+ * NTP_SYNC_HOUR must be during wake hours (not between SLEEP_START and SLEEP_END)
+ * Days of week: Sunday=1, Monday=2, Tuesday=3, Wednesday=4, Thursday=5, Friday=6, Saturday=7
+ */
+#define NTP_SYNC_ENABLED 1
+#define NTP_SYNC_HOUR 6  // Hour to perform NTP sync (must be during wake time, after SLEEP_END)
+#define NTP_SYNC_DAY1 2  // Monday
+#define NTP_SYNC_DAY2 5  // Thursday
+
+/*
+ * Button map selection. Current options are 0 and 1
+ *
+ * 0:
+ * BACK ------ SELECT
+ *      |    |
+ *      |    |
+ * LEFT ------ RIGHT
+ *
+ * 1:
+ * LEFT ------ RIGHT
+ *      |    |
+ *      |    |
+ * BACK ------ SELECT
+ */
+#define BUTTON_MAP 0
+
+#endif //TINYWATCHY_DEFINES_PRIVATE_H

@@ -28,6 +28,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include <GxEPD2_BW.h>
 #include <memory>
 #include "defines.h"
+#include "defines_private.h"
 #include "Screen.h"
 #include "NTP.h"
 #include "Menu.h"
@@ -51,6 +52,7 @@ private:
     void updateBatteryVoltage();
     void updateMenu();
     void setupAccelerometer();
+    void checkAndPerformNTPSync();
 
     static DateTime getLocalTime(DateTime time);
     static uint16_t readRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);

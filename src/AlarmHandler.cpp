@@ -10,6 +10,27 @@ AlarmHandler::AlarmHandler(SmallRTC *smallRTC, BMA423 *accel, bool *accelStatus,
 {
     _alarms[alarmTimeToIndex(SLEEP_START)] = {SLEEP_START, 0, true};
     _alarms[alarmTimeToIndex(SLEEP_END)] = {SLEEP_END, 0, true};
+    
+    // Add automatic wakeup alarms every WAKEUP_INTERVAL_MINUTES (e.g., 12:00, 12:05, 12:10, etc.)
+    // Only during wake hours (not during sleep time)
+    for (uint8_t hour = 0; hour < 24; hour++) {
+        // Skip sleep hours
+        bool isDuringSleep = false;
+        if (SLEEP_START > SLEEP_END) {
+            // Sleep crosses midnight (e.g., 23:00 to 05:00)
+            isDuringSleep = (hour >= SLEEP_START || hour < SLEEP_END);
+        } else {
+            // Normal sleep hours (e.g., 01:00 to 09:00)
+            isDuringSleep = (hour >= SLEEP_START && hour < SLEEP_END);
+        }
+        
+        if (!isDuringSleep) {
+            // Add alarms every WAKEUP_INTERVAL_MINUTES during wake hours
+            for (uint8_t minute = 0; minute < 60; minute += WAKEUP_INTERVAL_MINUTES) {
+                _alarms[alarmTimeToIndex(hour, minute)] = {hour, minute, true};
+            }
+        }
+    }
 }
 
 void AlarmHandler::handle(ScreenInfo const *screenInfo) {

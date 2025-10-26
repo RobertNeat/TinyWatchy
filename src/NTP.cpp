@@ -53,5 +53,10 @@ time_t NTP::getTime() {
 
     timeClient.end();
 
-    return timeClient.getEpochTime();
+    time_t epochTime = timeClient.getEpochTime();
+    
+    // Disconnect WiFi immediately after getting time to save power
+    WiFiHelper::disconnect();
+    
+    return epochTime;
 }

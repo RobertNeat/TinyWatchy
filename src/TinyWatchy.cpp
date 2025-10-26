@@ -23,6 +23,8 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "WiFiHelper.h"
 #include "MenuOptions/MenuOption.h"
 #include "MenuOptions/NTPOption.h"
+#include "esp_bt.h"
+#include "esp_wifi.h"
 
 SmallRTC TinyWatchy::_smallRTC;
 BMA423 TinyWatchy::_accelerometer;
@@ -37,6 +39,10 @@ TinyWatchy::TinyWatchy() : _display(WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLA
 
 void TinyWatchy::setup() {
     esp_sleep_wakeup_cause_t wakeupReason = esp_sleep_get_wakeup_cause();
+
+    // Permanently disable Bluetooth to save power (WiFi will be enabled only when needed for NTP)
+    btStop();
+    esp_bt_controller_disable();
 
     pinMode(VIB_MOTOR_PIN, OUTPUT);
     digitalWrite(VIB_MOTOR_PIN, LOW);
@@ -64,6 +70,7 @@ void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
         case ESP_SLEEP_WAKEUP_EXT0:
             updateMenu();
             _alarmHandler.handle(&_screenInfo);
+            updateBatteryVoltage(); // Update battery only before screen update
             _screen.update(true);
             break;
         case ESP_SLEEP_WAKEUP_EXT1:
@@ -72,11 +79,13 @@ void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
             }
             _menu.handleButtonPress();
             updateMenu();
+            updateBatteryVoltage(); // Update battery only before screen update
             _screen.update(true);
             break;
         default:
             setupAccelerometer();
             updateMenu();
+            updateBatteryVoltage(); // Update battery only before screen update
             _screen.update(false);
             break;
     }
@@ -124,9 +133,17 @@ void TinyWatchy::updateData() {
     _smallRTC.read((tmElements_t &) time);
     _screenInfo.time = getLocalTime(time);
 
-    updateBatteryVoltage();
-
-    _screenInfo.humanInSleep = (_screenInfo.time.hour >= SLEEP_START && _screenInfo.time.hour < SLEEP_END);
+    // Handle sleep time that crosses midnight (e.g., 23:00 to 05:00)
+    if (SLEEP_START > SLEEP_END) {
+        _screenInfo.humanInSleep = (_screenInfo.time.hour >= SLEEP_START || _screenInfo.time.hour < SLEEP_END);
+    } else {
+        _screenInfo.humanInSleep = (_screenInfo.time.hour >= SLEEP_START && _screenInfo.time.hour < SLEEP_END);
+    }
+    
+    // Check if it's time for automatic NTP synchronization (only when awake)
+    if (!_screenInfo.humanInSleep) {
+        checkAndPerformNTPSync();
+    }
     if (!_displayFullInit && _accelerometerStatus) {
         _screenInfo.steps = _accelerometer.getCounter();
     }
@@ -227,4 +244,30 @@ uint16_t TinyWatchy::writeRegisterHelper(uint8_t address, uint8_t reg, uint8_t *
     Wire.write(reg);
     Wire.write(data, len);
     return (0 != Wire.endTransmission());
+}
+
+void TinyWatchy::checkAndPerformNTPSync() {
+#if NTP_SYNC_ENABLED
+    // Check if current time matches NTP sync schedule
+    if (_screenInfo.time.hour == NTP_SYNC_HOUR && 
+        _screenInfo.time.minute == 0 &&  // Only sync at the exact hour
+        (_screenInfo.time.dayOfTheWeek == NTP_SYNC_DAY1 || _screenInfo.time.dayOfTheWeek == NTP_SYNC_DAY2)) {
+        
+        // Check if we already synced today (prevent multiple syncs in the same hour)
+        uint32_t lastSyncDate = _nvs.getInt("lastNtpSync", 0);
+        uint32_t currentDate = (_screenInfo.time.year << 16) | (_screenInfo.time.month << 8) | _screenInfo.time.day;
+        
+        if (lastSyncDate != currentDate) {
+            // Perform NTP synchronization
+            if (_ntp.sync()) {
+                // Update the last sync date to prevent multiple syncs today
+                _nvs.setInt("lastNtpSync", currentDate);
+                // Update time data after successful sync
+                DateTime time;
+                _smallRTC.read((tmElements_t &) time);
+                _screenInfo.time = getLocalTime(time);
+            }
+        }
+    }
+#endif
 }

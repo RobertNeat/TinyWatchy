@@ -63,6 +63,6 @@ COMMIT: opt: battery management optimization
 --> wyłączyć wybudzanie w godzinach 23:00 - 05:00
 2. ustawić synchronizację czasu o 3:00 we poniedziałki, czwartki
 3. pomiar napięcia energii tylko po wybudzeniu RTC (jednokrotnie po wybudzeniu)
-4. wybudzanie akcelerometrem ???
+4. wybudzanie akcelerometrem >> jest jedynie w czasie aktywnym
 
 ```
