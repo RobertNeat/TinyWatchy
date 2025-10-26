@@ -41,7 +41,7 @@ This software uses parts of the original [Watchy firmware](https://github.com/sq
 ------------------------------
 COMMIT: feat: add watch face
 ------------------------------
-1. dodać nową czcionkę
+1. dodać nową czcionkę [#]
 2. dodać nowy face
 	- data
 	- godzina
