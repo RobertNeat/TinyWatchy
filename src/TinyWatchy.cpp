@@ -220,9 +220,9 @@ DateTime TinyWatchy::getLocalTime(DateTime time) {
     localTime.minute = tempTM->tm_min;
     localTime.hour = tempTM->tm_hour;
     localTime.day = tempTM->tm_mday;
-    localTime.month = tempTM->tm_mon;
+    localTime.month = tempTM->tm_mon + 1;    // Convert 0-11 to 1-12
     localTime.dayOfTheWeek = tempTM->tm_wday;
-    localTime.year = tempTM->tm_year;
+    localTime.year = tempTM->tm_year - 70;   // Convert from 1900-based to 1970-based offset (2025-1900=125, 125-70=55, 55+1970=2025)
 
     return localTime;
 }
