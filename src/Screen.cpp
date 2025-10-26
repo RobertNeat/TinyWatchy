@@ -19,6 +19,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "Screen.h"
+#include "Faces/JetBrainsFace.h"
 #include "Faces/DefaultFace.h"
 #include "Faces/UwUFace.h"
 #if PRIVATE == 1
@@ -27,6 +28,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 Screen::Screen(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display, const ScreenInfo &screenInfo, ArduinoNvs *nvs) :
         _display(display), _screenInfo(screenInfo), _nvs(nvs) {
+    _faces.emplace_back(std::make_unique<JetBrainsFace>(display));
     _faces.emplace_back(std::make_unique<DefaultFace>(display));
     _faces.emplace_back(std::make_unique<UwUFace>(display));
 #if PRIVATE == 1
