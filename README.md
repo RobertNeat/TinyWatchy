@@ -32,3 +32,37 @@ TinyWatchy is released under the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en
 ## Acknowledgements
 
 This software uses parts of the original [Watchy firmware](https://github.com/sqfmi/Watchy/) licensed under MIT license as well as Bosch driver for BMA423.
+
+
+## To-do list
+
+```
+
+------------------------------
+COMMIT: feat: add watch face
+------------------------------
+1. dodać nową czcionkę
+2. dodać nowy face
+	- data
+	- godzina
+	- stan naładowania
+	- ikona synchronizacji
+ 
+ 
+------------------------------
+COMMIT: configuration
+------------------------------
+1. ustawić wifi domowe
+2. wyłączyć bluoetooth na stałe, żeby nie opobiierało prądu
+ 
+ 
+------------------------------
+COMMIT: opt: battery management optimization
+------------------------------
+1. ustawić odświerzanie czasu co 5 minut (wybudzanie)
+--> wyłączyć wybudzanie w godzinach 23:00 - 05:00
+2. ustawić synchronizację czasu o 3:00 we poniedziałki, czwartki
+3. pomiar napięcia energii tylko po wybudzeniu RTC (jednokrotnie po wybudzeniu)
+4. wybudzanie akcelerometrem ???
+
+```
