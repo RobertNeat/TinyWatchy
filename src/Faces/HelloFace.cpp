@@ -1,11 +1,17 @@
-#include "JetBrainsFace.h"
+#include "HelloFace.h"
 #include "resources.h"
+#include <array>
 
-JetBrainsFace::JetBrainsFace(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display) : AbstractFace(display) {
+const std::array<const char*, 12> monthNames = {
+    "january", "february", "march", "april", "may", "june",
+    "july", "august", "september", "october", "november", "december"
+};
+
+HelloFace::HelloFace(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display) : AbstractFace(display) {
 
 }
 
-void JetBrainsFace::draw(const ScreenInfo &screenInfo) {
+void HelloFace::draw(const ScreenInfo &screenInfo) {
     // Clear the display with white background
     _display->fillScreen(GxEPD_WHITE);
     
@@ -20,7 +26,7 @@ void JetBrainsFace::draw(const ScreenInfo &screenInfo) {
     }
 }
 
-void JetBrainsFace::drawTime(const DateTime &time) {
+void HelloFace::drawTime(const DateTime &time) {
     int16_t x, y;
     uint16_t w, h;
     
@@ -36,8 +42,8 @@ void JetBrainsFace::drawTime(const DateTime &time) {
     }
     timeStr += String(time.minute);
     
-    // Use JetBrains Mono Bold 22 for time
-    _display->setFont(&resources::JETBRAINS_MONO_BOLD_22);
+    // Use MomoSignature Regular 51 for time
+    _display->setFont(&resources::MOMO_SIGNATURE_REGULAR_28);
     _display->setTextColor(GxEPD_BLACK);
     
     // Get text bounds to center it
@@ -45,32 +51,26 @@ void JetBrainsFace::drawTime(const DateTime &time) {
     
     // Center horizontally, position at top third of screen
     int centerX = (200 - w) / 2;
-    int timeY = 60;
+    int timeY = 89;
     
     _display->setCursor(centerX, timeY);
     _display->print(timeStr);
 }
 
-void JetBrainsFace::drawDate(const DateTime &time) {
+void HelloFace::drawDate(const DateTime &time) {
     int16_t x, y;
     uint16_t w, h;
     
-    // Format date as DD.MM.YYYY
+    // Format date as "DD month YYYY"
     String dateStr = "";
-    if (time.day < 10) {
-        dateStr += "0";
-    }
     dateStr += String(time.day);
-    dateStr += ".";
-    if (time.month < 10) {
-        dateStr += "0";
-    }
-    dateStr += String(time.month + 1);  // Add 1 because months are 0-based
-    dateStr += ".";
+    dateStr += " ";
+    dateStr += monthNames[time.month];  // months are 0-based, perfect for array index
+    dateStr += " ";
     dateStr += String(time.year + 1970);  // Convert from 1970-based offset to actual year
 
-    // Use JetBrains Mono Thin 12 for date
-    _display->setFont(&resources::JETBRAINS_MONO_THIN_12);
+    // Use MomoSignature Regular 18 for date
+    _display->setFont(&resources::MOMO_SIGNATURE_REGULAR_8);
     _display->setTextColor(GxEPD_BLACK);
     
     // Get text bounds to center it
@@ -78,21 +78,21 @@ void JetBrainsFace::drawDate(const DateTime &time) {
     
     // Center horizontally, position below time
     int centerX = (200 - w) / 2;
-    int dateY = 90;
+    int dateY = 142;
     
     _display->setCursor(centerX, dateY);
     _display->print(dateStr);
 }
 
-void JetBrainsFace::drawBattery(const uint8_t &battery) {
+void HelloFace::drawBattery(const uint8_t &battery) {
     int16_t x, y;
     uint16_t w, h;
     
     // Format battery as XX%
-    String batteryStr = String(battery) + "%";
-    
-    // Use JetBrains Mono Thin 10 for battery
-    _display->setFont(&resources::JETBRAINS_MONO_THIN_10);
+    String batteryStr = "battery "+String(battery) + "%";
+
+    // Use MomoSignature Regular 18 for battery
+    _display->setFont(&resources::MOMO_SIGNATURE_REGULAR_13);
     _display->setTextColor(GxEPD_BLACK);
     
     // Get text bounds to center it
@@ -100,18 +100,18 @@ void JetBrainsFace::drawBattery(const uint8_t &battery) {
     
     // Center horizontally, position below date
     int centerX = (200 - w) / 2;
-    int batteryY = 120;
+    int batteryY = 180;
     
     _display->setCursor(centerX, batteryY);
     _display->print(batteryStr);
 }
 
-void JetBrainsFace::drawMenuTitle(const std::string &title) {
+void HelloFace::drawMenuTitle(const std::string &title) {
     int16_t x, y;
     uint16_t w, h;
     String text(title.c_str());
     
-    _display->setFont(&resources::JETBRAINS_MONO_THIN_10);
+    _display->setFont(&resources::MOMO_SIGNATURE_REGULAR_10);
     _display->setTextColor(GxEPD_BLACK);
     _display->getTextBounds(text, 0, 0, &x, &y, &w, &h);
 
@@ -119,12 +119,12 @@ void JetBrainsFace::drawMenuTitle(const std::string &title) {
     _display->print(title.c_str());
 }
 
-void JetBrainsFace::drawMenuDescription(const std::string &description) {
+void HelloFace::drawMenuDescription(const std::string &description) {
     int16_t x, y;
     uint16_t w, h;
     String text(description.c_str());
     
-    _display->setFont(&resources::JETBRAINS_MONO_THIN_10);
+    _display->setFont(&resources::MOMO_SIGNATURE_REGULAR_10);
     _display->setTextColor(GxEPD_BLACK);
     _display->getTextBounds(text, 0, 0, &x, &y, &w, &h);
 

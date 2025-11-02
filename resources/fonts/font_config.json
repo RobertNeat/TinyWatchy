@@ -8,5 +8,7 @@
 
   "jetbrains_mono_regular.ttf":[15],
   "jetbrains_mono_bold.ttf":[22,50],
-  "jetbrains_mono_thin.ttf":[10,12]
+  "jetbrains_mono_thin.ttf":[10,12],
+
+  "momo_signature_regular.ttf":[8,10,13,28]
 }
