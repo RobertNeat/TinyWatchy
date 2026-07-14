@@ -35,7 +35,9 @@ public:
 
 private:
     void drawMenu();
+    void drawMenuList();
     void drawCenteredText(const std::string &text, const GFXfont *font, int16_t centerY);
+    bool textFits(const std::string &text, const GFXfont *font, uint16_t maximumWidth);
 
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *_display;
     std::vector<std::unique_ptr<AbstractFace>> _faces;

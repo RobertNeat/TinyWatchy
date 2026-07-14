@@ -10,109 +10,84 @@ the Free Software Foundation, either version 3 of the License, or
 
 TinyWatchy is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 #ifndef TINYWATCHY_MENU_H
 #define TINYWATCHY_MENU_H
 
-#include <string>
+#include <ArduinoNvs.h>
+#include <SmallRTC.h>
 #include <map>
-#include <vector>
-#include <stack>
-#include "MenuOptions/AbstractOption.h"
-#include "MenuOptions/MenuOption.h"
-#include "ScreenInfo.h"
-#include "Screen.h"
-#include "MenuPage.h"
-#include "MenuOptions/NTPOption.h"
-#include "MenuOptions/SubMenuOption.h"
-#include "MenuOptions/AccelerometerOption.h"
-#include "MenuOptions/AboutOption.h"
-#include "MenuOptions/VoltageOption.h"
-#include "MenuOptions/WatchfaceOption.h"
-#include "MenuOptions/DriftOption.h"
-#include "MenuOptions/UiOption.h"
+#include <string>
+
+#include "AccelParser.h"
 #include "AlarmHandler.h"
-#include "MenuOptions/AlarmSetOption.h"
-#include "MenuOptions/AlarmClearOption.h"
+#include "NTP.h"
+#include "Screen.h"
+#include "Watchy/bma.h"
 
 class Menu {
 public:
-    Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs,
-         AlarmHandler *alarmHandler);
+    Menu(NTP *ntp, BMA423 *accelerometer, SmallRTC *smallRTC, Screen *screen,
+         ArduinoNvs *nvs, AlarmHandler *alarmHandler);
+
     void handleButtonPress();
+    void processPendingAction();
+    bool hasPendingAction() const;
 
     std::string getTitle();
     std::string getDescription();
-    bool isMainOption();
+    std::vector<std::string> getMenuItems();
+    bool isSubmenu() const;
+    bool isMainOption() const;
 
 private:
+    enum class Level : uint8_t { WATCHFACE, MAIN_MENU, SUBMENU };
+    enum class PendingAction : uint8_t { NONE, NTP_SYNC, RTC_CALIBRATION };
+    enum class OperationStatus : uint8_t { IDLE, STARTED, WIFI_ERROR, SYNC_ERROR, COMPLETED };
+    enum class AlarmEdit : uint8_t { NONE, HOURS, MINUTES };
+
     static uint8_t getButtonPressed(const uint64_t &wakeupBit);
-    void nextOption();
-    void prevOption();
-    void selectOption();
-    void backOption();
-    const MenuPage& getCurrentPage();
-    AbstractOption* getCurrentItem();
-    StackPage& getCurrentStackPage();
-    void changePage(uint8_t menuPage);
+    void next();
+    void previous();
+    void select();
+    void back();
+    void cycleAlarmValue(int direction);
+    void toggleAlarm();
+    void loadAlarm(uint8_t &hour, uint8_t &minute) const;
+    void saveAlarm(uint8_t hour, uint8_t minute);
+    uint8_t submenuSize() const;
+    bool isSubmenuItemSelectable(uint8_t index) const;
+    void moveSubmenuSelection(int direction);
 
-private:
-    RTC_DATA_ATTR static uint8_t _currentStackPage;
-    RTC_DATA_ATTR static StackPage _pageStack[3];
+    std::string mainTitle() const;
+    static std::string mainLabel(uint8_t index);
+    std::string submenuLabel(uint8_t index) const;
+    std::string submenuValue(uint8_t index);
+    std::string ntpSchedule() const;
+    std::string alarmTime() const;
+    std::string orientation() const;
+    std::string macAddress() const;
+    static std::string statusText(OperationStatus status);
+
+    RTC_DATA_ATTR static Level _level;
+    RTC_DATA_ATTR static uint8_t _mainIndex;
+    RTC_DATA_ATTR static uint8_t _submenuIndex;
+    RTC_DATA_ATTR static AlarmEdit _alarmEdit;
+    RTC_DATA_ATTR static PendingAction _pendingAction;
+    RTC_DATA_ATTR static OperationStatus _ntpStatus;
+    RTC_DATA_ATTR static OperationStatus _rtcStatus;
     static const std::map<uint8_t, std::map<uint8_t, int>> _buttonMap;
-    NTPOption _ntpOption;
+
+    NTP *_ntp;
     BMA423 *_accelerometer;
-    MenuOption _menuOption;
-    SubMenuOption _settingsSubmenu;
-    SubMenuOption _alarmSubmenu;
-    AboutOption _aboutOption;
-    VoltageOption _voltageOption;
-    AccelerometerOption _accelerometerOption;
-    WatchfaceOption _watchfaceOption;
-    DriftOption _driftOption;
-    UiOption _uiOption;
-    AlarmSetOption _alarmSetOption;
-    AlarmClearOption _alarmClearOption;
-#if PRIVATE == 1
-    AbstractOption *_abstractOption1;
-#endif
-    const MenuPage _pages[3] = {
-        {
-            .items = {
-                &_menuOption,
-                &_ntpOption,
-#if PRIVATE == 1
-                _abstractOption1,
-#endif
-                &_settingsSubmenu,
-            },
-        },
-        {
-            .items = {
-                &_aboutOption,
-                &_alarmSubmenu,
-                &_accelerometerOption,
-                &_voltageOption,
-                &_watchfaceOption,
-                &_driftOption,
-                &_uiOption,
-            }
-        },
-        {
-            .items = {
-                &_alarmSetOption,
-                &_alarmClearOption,
-            }
-        }
-    };
+    SmallRTC *_smallRTC;
+    Screen *_screen;
+    ArduinoNvs *_nvs;
+    AlarmHandler *_alarmHandler;
 };
 
-
-#endif //TINYWATCHY_MENU_H
+#endif

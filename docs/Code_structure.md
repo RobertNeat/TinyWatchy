@@ -9,7 +9,7 @@ Application sources live in `src/`, source assets in `resources/`, PlatformIO co
 - `AlarmHandler.cpp` / `AlarmHandler.h`: system and user alarms, RTC wake scheduling, and active/sleep accelerometer state.
 - `NTP.cpp` / `NTP.h`: NTP synchronization and RTC updates.
 - `WiFiHelper.h`: short-lived Wi-Fi connections used by NTP.
-- `Menu.cpp` / `Menu.h`: button handling, menu navigation, and option ownership.
+- `Menu.cpp` / `Menu.h`: retained watchface/main-menu/submenu state, button handling, actions, and menu values.
 - `Screen.cpp` / `Screen.h`: watch-face registration, selection, and rendering.
 - `ScreenInfo.h`: data passed to every watch face.
 - `DateTime.h`: compact time structure compatible with the RTC conversion code.

@@ -31,8 +31,6 @@ private:
     BMA423 *_accel;
     bool *_accelStatus;
     ArduinoNvs *_nvs;
-    bool _userAlarmLoaded = false;
-
     std::map<uint16_t, Alarm> _alarms;
 };
 

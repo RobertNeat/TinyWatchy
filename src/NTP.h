@@ -22,17 +22,26 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define TINYWATCHY_NTP_H
 
 #include "SmallRTC.h"
+#include "ArduinoNvs.h"
 
 class NTP {
 public:
-    explicit NTP(SmallRTC *smallRTC);
+    enum class SyncResult : uint8_t {
+        COMPLETED,
+        WIFI_ERROR,
+        SYNC_ERROR,
+    };
+
+    explicit NTP(SmallRTC *smallRTC, ArduinoNvs *nvs);
 
     bool sync();
+    SyncResult syncWithStatus();
 
-    time_t getTime();
+    time_t getTime(SyncResult *result = nullptr);
 
 private:
     SmallRTC *_smallRTC{};
+    ArduinoNvs *_nvs{};
 };
 
 #endif //TINYWATCHY_NTP_H

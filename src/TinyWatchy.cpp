@@ -32,7 +32,7 @@ bool TinyWatchy::_accelerometerStatus = false;
 bool TinyWatchy::_displayFullInit = true;
 
 TinyWatchy::TinyWatchy() : _display(WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY)),
-        _screen(&_display, _screenInfo, &_nvs), _ntp(&_smallRTC),
+        _screen(&_display, _screenInfo, &_nvs), _ntp(&_smallRTC, &_nvs),
         _alarmHandler(&_smallRTC, &_accelerometer, &_accelerometerStatus, &_nvs),
         _menu(&_ntp, &_accelerometer, &_smallRTC, &_screen, &_nvs, &_alarmHandler) {
 }
@@ -81,6 +81,11 @@ void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
             updateMenu();
             updateBatteryVoltage(); // Update battery only before screen update
             _screen.update(true);
+            if (_menu.hasPendingAction()) {
+                _menu.processPendingAction();
+                updateMenu();
+                _screen.update(true);
+            }
             break;
         default:
             setupAccelerometer();
@@ -160,6 +165,8 @@ void TinyWatchy::updateData() {
 void TinyWatchy::updateMenu() {
     _screenInfo.title = _menu.getTitle();
     _screenInfo.description = _menu.getDescription();
+    _screenInfo.menuItems = _menu.getMenuItems();
+    _screenInfo.onSubmenu = _menu.isSubmenu();
     _screenInfo.onMainOption = _menu.isMainOption();
 }
 

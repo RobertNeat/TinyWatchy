@@ -104,11 +104,17 @@ void AlarmHandler::setNextAlarm(const DateTime &screenTime) {
 }
 
 void AlarmHandler::loadUserAlarm() {
-    if (_userAlarmLoaded) return;
+    for (auto alarm = _alarms.begin(); alarm != _alarms.end();) {
+        if (!alarm->second.system) {
+            alarm = _alarms.erase(alarm);
+        } else {
+            ++alarm;
+        }
+    }
 
     std::vector<uint8_t> alarmTime = _nvs->getBlob("alarm");
-    if (!alarmTime.empty()) {
+    const bool enabled = _nvs->getInt("alarm_enabled", !alarmTime.empty());
+    if (enabled && alarmTime.size() >= 2 && alarmTime[0] < 24 && alarmTime[1] < 60) {
         _alarms[alarmTimeToIndex(alarmTime[0], alarmTime[1])] = {alarmTime[0], alarmTime[1], false};
-        _userAlarmLoaded = true;
     }
 }

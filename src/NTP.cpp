@@ -22,34 +22,42 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "WiFiHelper.h"
 #include "NTPClient.h"
 
-NTP::NTP(SmallRTC *smallRTC) : _smallRTC(smallRTC) {}
+NTP::NTP(SmallRTC *smallRTC, ArduinoNvs *nvs) : _smallRTC(smallRTC), _nvs(nvs) {}
 
 bool NTP::sync() {
-    time_t epochTime = getTime();
+    return syncWithStatus() == SyncResult::COMPLETED;
+}
+
+NTP::SyncResult NTP::syncWithStatus() {
+    SyncResult result;
+    time_t epochTime = getTime(&result);
 
     if (epochTime == 0) {
-        return false;
+        return result;
     }
 
     tmElements_t time;
     _smallRTC->doBreakTime(epochTime, time);
     _smallRTC->set(time);
 
-    return true;
+    return SyncResult::COMPLETED;
 }
 
-time_t NTP::getTime() {
+time_t NTP::getTime(SyncResult *result) {
     if (!WiFiHelper::connect()) {
         WiFiHelper::disconnect();
+        if (result) *result = SyncResult::WIFI_ERROR;
         return 0;
     }
 
+    if (_nvs) _nvs->setString("last_ip", WiFi.localIP().toString());
+
     WiFiUDP ntpUDP;
-    NTPClient timeClient(ntpUDP);
+    NTPClient timeClient(ntpUDP, NTP_SERVER);
 
     timeClient.begin();
 
-    timeClient.forceUpdate();
+    const bool updated = timeClient.forceUpdate();
 
     timeClient.end();
 
@@ -57,6 +65,12 @@ time_t NTP::getTime() {
     
     // Disconnect WiFi immediately after getting time to save power
     WiFiHelper::disconnect();
-    
+
+    if (!updated || epochTime < 946684800) {
+        if (result) *result = SyncResult::SYNC_ERROR;
+        return 0;
+    }
+
+    if (result) *result = SyncResult::COMPLETED;
     return epochTime;
 }

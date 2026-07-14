@@ -22,6 +22,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define TINYWATCHY_SCREENINFO_H
 
 #include <string>
+#include <vector>
 #include "TimeLib.h"
 #include "DateTime.h"
 
@@ -31,6 +32,8 @@ struct ScreenInfo {
     uint8_t battery = 0;
     std::string title;
     std::string description;
+    std::vector<std::string> menuItems;
+    bool onSubmenu = false;
     bool onMainOption = true;
     bool humanInSleep = false;
 };

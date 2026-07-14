@@ -23,7 +23,11 @@ Power consumption depends on the selected watch face, interaction frequency, Wi-
 
 - Watch faces can be selected at runtime and the selection is stored in NVS.
 - Included faces are HelloFace, JetBrains, Default, and UwU.
-- The menu provides manual NTP sync, alarms, accelerometer information, battery voltage, watch-face selection, RTC drift configuration, UI testing, and firmware information.
+- The watch face sits outside the cyclic menu. `OK` opens the menu, `BACK` returns to the watch face, and the navigation buttons cycle through entries.
+- The main menu and each submenu display all entries on one page using a smaller font; the active entry is marked with `<-`.
+- Read-only submenu entries are displayed without `<-` and are skipped by cyclic navigation.
+- The menu groups time synchronization and RTC calibration, alarm status and time, watch-face selection, Wi-Fi configuration, device properties, and firmware information.
+- Alarm hours and minutes are edited separately; minutes change in ten-minute increments. Changes are stored when leaving the submenu with `BACK`.
 - The physical button layout can be selected with `BUTTON_MAP`.
 
 ## Sensors and alarms
@@ -35,5 +39,5 @@ Power consumption depends on the selected watch face, interaction frequency, Wi-
 ## Extensibility
 
 - Watch faces implement `AbstractFace` and are registered by `Screen`.
-- Menu features implement `AbstractOption` and are registered in the page structure owned by `Menu`.
+- `Menu` owns the retained watchface/main-menu/submenu state machine and the fixed category layout.
 - Fonts and monochrome images are generated into `src/resources.h` from source assets.

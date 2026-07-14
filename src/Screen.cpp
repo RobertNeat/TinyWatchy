@@ -60,12 +60,43 @@ void Screen::update(bool partial) {
 }
 
 void Screen::drawMenu() {
+    if (!_screenInfo.menuItems.empty()) {
+        drawMenuList();
+        return;
+    }
+
     constexpr int16_t titleCenterY = 82;
     constexpr int16_t descriptionCenterY = 118;
 
     _display->setTextColor(GxEPD_BLACK);
     drawCenteredText(_screenInfo.title, &resources::JETBRAINS_MONO_REGULAR_15, titleCenterY);
     drawCenteredText(_screenInfo.description, &resources::JETBRAINS_MONO_THIN_10, descriptionCenterY);
+}
+
+void Screen::drawMenuList() {
+    constexpr int16_t titleCenterY = 28;
+    const bool mainMenu = !_screenInfo.onSubmenu;
+    const int16_t firstItemCenterY = mainMenu ? 58 : 68;
+    const int16_t itemSpacing = mainMenu ? 23 : 30;
+
+    _display->setTextColor(GxEPD_BLACK);
+    drawCenteredText(_screenInfo.title, &resources::JETBRAINS_MONO_REGULAR_15, titleCenterY);
+
+    const GFXfont *itemFont = mainMenu ? &resources::JETBRAINS_MONO_THIN_10 :
+                                        &resources::EIGHT_BIT_OPERATOR_PLUS_BOLD_6;
+    if (!mainMenu) {
+        for (const std::string &item : _screenInfo.menuItems) {
+            if (!textFits(item, itemFont, 196)) {
+                itemFont = nullptr;
+                break;
+            }
+        }
+    }
+
+    for (size_t index = 0; index < _screenInfo.menuItems.size(); ++index) {
+        const int16_t centerY = static_cast<int16_t>(firstItemCenterY + index * itemSpacing);
+        drawCenteredText(_screenInfo.menuItems[index], itemFont, centerY);
+    }
 }
 
 void Screen::drawCenteredText(const std::string &text, const GFXfont *font, int16_t centerY) {
@@ -75,6 +106,7 @@ void Screen::drawCenteredText(const std::string &text, const GFXfont *font, int1
     uint16_t height;
     String printable(text.c_str());
 
+    _display->setTextWrap(false);
     _display->setFont(font);
     _display->getTextBounds(printable, 0, 0, &x, &y, &width, &height);
 
@@ -87,6 +119,19 @@ void Screen::drawCenteredText(const std::string &text, const GFXfont *font, int1
 
     _display->setCursor(cursorX, cursorY);
     _display->print(printable);
+    _display->setTextWrap(true);
+}
+
+bool Screen::textFits(const std::string &text, const GFXfont *font, uint16_t maximumWidth) {
+    int16_t x;
+    int16_t y;
+    uint16_t width;
+    uint16_t height;
+    _display->setTextWrap(false);
+    _display->setFont(font);
+    _display->getTextBounds(String(text.c_str()), 0, 0, &x, &y, &width, &height);
+    _display->setTextWrap(true);
+    return width <= maximumWidth;
 }
 
 const std::vector<std::unique_ptr<AbstractFace>> &Screen::getFaces() const {
