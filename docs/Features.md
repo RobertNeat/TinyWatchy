@@ -26,6 +26,8 @@ Power consumption depends on the selected watch face, interaction frequency, Wi-
 - The watch face sits outside the cyclic menu. `OK` opens the menu, `BACK` returns to the watch face, and the navigation buttons cycle through entries.
 - The main menu and each submenu display all entries on one page using a smaller font; the active entry is marked with `<-`.
 - Read-only submenu entries are displayed without `<-` and are skipped by cyclic navigation.
+- The main menu labels all four physical buttons according to the selected `BUTTON_MAP` (`LEFT`/`RIGHT` or `UP`/`DOWN`, plus `OK` and `BACK`).
+- `WATCHFACE > BTN Layout` changes the active button map between `0`, `1`, and `2`; the choice is stored in NVS, while `BUTTON_MAP` remains the default for a fresh installation.
 - The menu groups time synchronization and RTC calibration, alarm status and time, watch-face selection, Wi-Fi configuration, device properties, and firmware information.
 - Alarm hours and minutes are edited separately; minutes change in ten-minute increments. Changes are stored when leaving the submenu with `BACK`.
 - The physical button layout can be selected with `BUTTON_MAP`.

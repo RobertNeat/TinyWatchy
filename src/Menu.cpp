@@ -39,6 +39,7 @@ Menu::AlarmEdit Menu::_alarmEdit = Menu::AlarmEdit::NONE;
 Menu::PendingAction Menu::_pendingAction = Menu::PendingAction::NONE;
 Menu::OperationStatus Menu::_ntpStatus = Menu::OperationStatus::IDLE;
 Menu::OperationStatus Menu::_rtcStatus = Menu::OperationStatus::IDLE;
+uint8_t Menu::_buttonLayoutSelection = BUTTON_MAP;
 
 const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
     {0, {{RIGHT_BTN_PIN, Button::RIGHT}, {LEFT_BTN_PIN, Button::LEFT},
@@ -62,7 +63,7 @@ void Menu::handleButtonPress() {
     if (_accelerometer->getAccel(data) &&
         AccelParser::normalizeOrientation(data) == AccelParser::RIGHT_EDGE) return;
 
-    const int button = _buttonMap.at(BUTTON_MAP).at(getButtonPressed(wakeupBit));
+    const int button = _buttonMap.at(getButtonLayout()).at(getButtonPressed(wakeupBit));
     switch (button) {
         case Button::RIGHT: next(); break;
         case Button::LEFT: previous(); break;
@@ -146,6 +147,11 @@ bool Menu::isSubmenu() const { return _level == Level::SUBMENU; }
 
 bool Menu::isMainOption() const { return _level == Level::WATCHFACE; }
 
+uint8_t Menu::getButtonLayout() const {
+    const int layout = _nvs->getInt("button_layout", BUTTON_MAP);
+    return layout >= 0 && layout <= 2 ? static_cast<uint8_t>(layout) : BUTTON_MAP;
+}
+
 uint8_t Menu::getButtonPressed(const uint64_t &wakeupBit) {
     if (wakeupBit & RIGHT_BTN_MASK) return RIGHT_BTN_PIN;
     if (wakeupBit & LEFT_BTN_MASK) return LEFT_BTN_PIN;
@@ -185,6 +191,7 @@ void Menu::select() {
         _level = Level::SUBMENU;
         _submenuIndex = 0;
         _alarmEdit = AlarmEdit::NONE;
+        if (_mainIndex == 2) _buttonLayoutSelection = getButtonLayout();
         if (!isSubmenuItemSelectable(_submenuIndex)) moveSubmenuSelection(1);
         return;
     }
@@ -203,15 +210,20 @@ void Menu::select() {
         _alarmEdit = _alarmEdit == AlarmEdit::NONE ? AlarmEdit::HOURS :
                      _alarmEdit == AlarmEdit::HOURS ? AlarmEdit::MINUTES : AlarmEdit::HOURS;
     } else if (_mainIndex == 2) {
-        const size_t count = _screen->getFaces().size();
-        const int current = _nvs->getInt("watchface", 0);
-        if (count) _nvs->setInt("watchface", (current + 1) % count);
+        if (_submenuIndex == 0) {
+            const size_t count = _screen->getFaces().size();
+            const int current = _nvs->getInt("watchface", 0);
+            if (count) _nvs->setInt("watchface", (current + 1) % count);
+        } else {
+            _buttonLayoutSelection = (_buttonLayoutSelection + 1) % 3;
+        }
     }
 }
 
 void Menu::back() {
     _alarmEdit = AlarmEdit::NONE;
     if (_level == Level::SUBMENU) {
+        if (_mainIndex == 2) _nvs->setInt("button_layout", _buttonLayoutSelection);
         _level = Level::MAIN_MENU;
     } else if (_level == Level::MAIN_MENU) {
         _level = Level::WATCHFACE;
@@ -249,14 +261,14 @@ void Menu::saveAlarm(uint8_t hour, uint8_t minute) {
 }
 
 uint8_t Menu::submenuSize() const {
-    static constexpr uint8_t sizes[] = {3, 2, 1, 3, 4, 3};
+    static constexpr uint8_t sizes[] = {3, 2, 2, 3, 4, 3};
     return sizes[_mainIndex];
 }
 
 bool Menu::isSubmenuItemSelectable(uint8_t index) const {
     if (_mainIndex == 0) return index == 0 || index == 2;
     if (_mainIndex == 1) return true;
-    if (_mainIndex == 2) return index == 0;
+    if (_mainIndex == 2) return true;
     return false;
 }
 
@@ -286,7 +298,7 @@ std::string Menu::submenuLabel(uint8_t index) const {
     static const char *labels[][4] = {
         {"NTP sync", "schedule", "RTC calib.", ""},
         {"Status", "Time", "", ""},
-        {"Face", "", "", ""},
+        {"Face", "BTN Layout", "", ""},
         {"SSID", "PASSWORD", "HOSTNAME", ""},
         {"MAC", "IP", "Battery", "Orientation"},
         {"", "", "Version", ""},
@@ -308,6 +320,7 @@ std::string Menu::submenuValue(uint8_t index) {
         return alarmTime();
     }
     if (_mainIndex == 2) {
+        if (index == 1) return std::to_string(_buttonLayoutSelection);
         int face = _nvs->getInt("watchface", 0);
         if (face < 0 || static_cast<size_t>(face) >= _screen->getFaces().size()) face = 0;
         return _screen->getFaces().at(face)->getName();

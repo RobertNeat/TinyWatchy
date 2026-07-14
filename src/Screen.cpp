@@ -23,6 +23,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "Faces/JetBrainsFace.h"
 #include "Faces/DefaultFace.h"
 #include "Faces/UwUFace.h"
+#include "defines.h"
 #include "resources.h"
 #if PRIVATE == 1
 #include "Faces/Private/Include.h"
@@ -97,6 +98,46 @@ void Screen::drawMenuList() {
         const int16_t centerY = static_cast<int16_t>(firstItemCenterY + index * itemSpacing);
         drawCenteredText(_screenInfo.menuItems[index], itemFont, centerY);
     }
+
+    if (mainMenu) drawMainMenuButtonHints();
+}
+
+void Screen::drawMainMenuButtonHints() {
+    if (_screenInfo.buttonLayout == 0) {
+        drawButtonHint("BACK", false, 9);
+        drawButtonHint("OK", true, 9);
+        drawButtonHint("LEFT", false, 190);
+        drawButtonHint("RIGHT", true, 190);
+    } else if (_screenInfo.buttonLayout == 1) {
+        drawButtonHint("LEFT", false, 9);
+        drawButtonHint("RIGHT", true, 9);
+        drawButtonHint("BACK", false, 190);
+        drawButtonHint("OK", true, 190);
+    } else {
+        drawButtonHint("BACK", false, 9);
+        drawButtonHint("UP", true, 9);
+        drawButtonHint("OK", false, 190);
+        drawButtonHint("DOWN", true, 190);
+    }
+}
+
+void Screen::drawButtonHint(const char *text, bool rightAligned, int16_t centerY) {
+    int16_t x;
+    int16_t y;
+    uint16_t width;
+    uint16_t height;
+    const String printable(text);
+
+    _display->setTextWrap(false);
+    _display->setFont(&resources::EIGHT_BIT_OPERATOR_PLUS_BOLD_6);
+    _display->getTextBounds(printable, 0, 0, &x, &y, &width, &height);
+
+    const int16_t cursorX = rightAligned ?
+        static_cast<int16_t>(_display->width() - 2 - width - x) : static_cast<int16_t>(2 - x);
+    const int16_t cursorY = static_cast<int16_t>(centerY - static_cast<int16_t>(height) / 2 - y);
+    _display->setCursor(cursorX, cursorY);
+    _display->print(printable);
+    _display->setTextWrap(true);
 }
 
 void Screen::drawCenteredText(const std::string &text, const GFXfont *font, int16_t centerY) {

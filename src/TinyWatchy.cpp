@@ -166,6 +166,7 @@ void TinyWatchy::updateMenu() {
     _screenInfo.title = _menu.getTitle();
     _screenInfo.description = _menu.getDescription();
     _screenInfo.menuItems = _menu.getMenuItems();
+    _screenInfo.buttonLayout = _menu.getButtonLayout();
     _screenInfo.onSubmenu = _menu.isSubmenu();
     _screenInfo.onMainOption = _menu.isMainOption();
 }

@@ -33,6 +33,7 @@ struct ScreenInfo {
     std::string title;
     std::string description;
     std::vector<std::string> menuItems;
+    uint8_t buttonLayout = 0;
     bool onSubmenu = false;
     bool onMainOption = true;
     bool humanInSleep = false;

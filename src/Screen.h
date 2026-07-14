@@ -36,6 +36,8 @@ public:
 private:
     void drawMenu();
     void drawMenuList();
+    void drawMainMenuButtonHints();
+    void drawButtonHint(const char *text, bool rightAligned, int16_t centerY);
     void drawCenteredText(const std::string &text, const GFXfont *font, int16_t centerY);
     bool textFits(const std::string &text, const GFXfont *font, uint16_t maximumWidth);
 

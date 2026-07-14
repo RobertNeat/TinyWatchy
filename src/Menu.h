@@ -41,6 +41,7 @@ public:
     std::string getTitle();
     std::string getDescription();
     std::vector<std::string> getMenuItems();
+    uint8_t getButtonLayout() const;
     bool isSubmenu() const;
     bool isMainOption() const;
 
@@ -80,6 +81,7 @@ private:
     RTC_DATA_ATTR static PendingAction _pendingAction;
     RTC_DATA_ATTR static OperationStatus _ntpStatus;
     RTC_DATA_ATTR static OperationStatus _rtcStatus;
+    RTC_DATA_ATTR static uint8_t _buttonLayoutSelection;
     static const std::map<uint8_t, std::map<uint8_t, int>> _buttonMap;
 
     NTP *_ntp;
