@@ -113,10 +113,15 @@ void Screen::drawMainMenuButtonHints() {
         drawButtonHint("RIGHT", true, 9);
         drawButtonHint("BACK", false, 190);
         drawButtonHint("OK", true, 190);
-    } else {
+    } else if (_screenInfo.buttonLayout == 2) {
         drawButtonHint("BACK", false, 9);
         drawButtonHint("UP", true, 9);
         drawButtonHint("OK", false, 190);
+        drawButtonHint("DOWN", true, 190);
+    } else {
+        drawButtonHint("OK", false, 9);
+        drawButtonHint("UP", true, 9);
+        drawButtonHint("BACK", false, 190);
         drawButtonHint("DOWN", true, 190);
     }
 }

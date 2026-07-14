@@ -27,12 +27,12 @@
 #define NTP_SYNC_DAY1 2
 #define NTP_SYNC_DAY2 5
 
-// Button map selection. Current options are 0 and 1.
+// Button map selection. Current options are 0, 1, 2 and 3.
 //
-// 0:                 1:
-// BACK ---- SELECT   LEFT ---- RIGHT
-//   |        |         |        |
-// LEFT ---- RIGHT    BACK ---- SELECT
+// 0:                 1:                2:             3:
+// BACK ---- SELECT   LEFT ---- RIGHT   BACK ---- UP   OK ---- UP
+//   |        |         |        |        |      |      |      |
+// LEFT ---- RIGHT    BACK ---- SELECT  OK ---- DOWN  BACK -- DOWN
 #define BUTTON_MAP 0
 
 #endif // TINYWATCHY_DEFINES_PRIVATE_H

@@ -78,8 +78,8 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #error "NTP synchronization days must be between 1 (Sunday) and 7 (Saturday)"
 #endif
 
-#if BUTTON_MAP != 0 && BUTTON_MAP != 1 && BUTTON_MAP != 2
-#error "BUTTON_MAP must be 0, 1 or 2"
+#if BUTTON_MAP != 0 && BUTTON_MAP != 1 && BUTTON_MAP != 2 && BUTTON_MAP != 3
+#error "BUTTON_MAP must be 0, 1, 2 or 3"
 #endif
 
 #if WIFI_TIMEOUT <= 0

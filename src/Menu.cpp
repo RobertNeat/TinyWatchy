@@ -49,6 +49,8 @@ const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
          {SELECT_BTN_PIN, Button::RIGHT}, {BACK_BTN_PIN, Button::LEFT}}},
     {2, {{RIGHT_BTN_PIN, Button::RIGHT}, {LEFT_BTN_PIN, Button::SELECT},
          {SELECT_BTN_PIN, Button::LEFT}, {BACK_BTN_PIN, Button::BACK}}},
+    {3, {{RIGHT_BTN_PIN, Button::RIGHT}, {LEFT_BTN_PIN, Button::BACK},
+         {SELECT_BTN_PIN, Button::LEFT}, {BACK_BTN_PIN, Button::SELECT}}},
 };
 
 Menu::Menu(NTP *ntp, BMA423 *accelerometer, SmallRTC *smallRTC, Screen *screen,
@@ -156,7 +158,7 @@ bool Menu::isMainOption() const { return _level == Level::WATCHFACE; }
 
 uint8_t Menu::getButtonLayout() const {
     const int layout = _nvs->getInt("button_layout", BUTTON_MAP);
-    return layout >= 0 && layout <= 2 ? static_cast<uint8_t>(layout) : BUTTON_MAP;
+    return layout >= 0 && layout <= 3 ? static_cast<uint8_t>(layout) : BUTTON_MAP;
 }
 
 uint8_t Menu::getButtonPressed(const uint64_t &wakeupBit) {
@@ -226,7 +228,7 @@ void Menu::select() {
             const int current = _nvs->getInt("watchface", 0);
             if (count) _nvs->setInt("watchface", (current + 1) % count);
         } else {
-            _buttonLayoutSelection = (_buttonLayoutSelection + 1) % 3;
+            _buttonLayoutSelection = (_buttonLayoutSelection + 1) % 4;
         }
     }
 }
