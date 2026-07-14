@@ -41,7 +41,7 @@ See [the feature reference](docs/Features.md) for details.
 5. Edit `src/defines_private.h`. It is ignored by Git and contains settings that may differ between devices or installations:
 
    - `WIFI_SSID`, `WIFI_PASS`, `WIFI_HOSTNAME`, and `WIFI_TIMEOUT`;
-   - `TIMEZONE` in POSIX format, for example `CET-1CEST,M3.5.0,M10.5.0/3` for Poland;
+   - `TIMEZONE`, `TIMEZONE_STANDARD`, and `AUTO_DST_DEFAULT`; the Polish POSIX rule is `CET-1CEST,M3.5.0/2,M10.5.0/3`;
    - `SLEEP_START`, `SLEEP_END`, and `WAKEUP_INTERVAL_MINUTES`;
    - `NTP_SYNC_ENABLED`, `NTP_SYNC_HOUR`, `NTP_SYNC_DAY1`, and `NTP_SYNC_DAY2`;
    - `BUTTON_MAP`.

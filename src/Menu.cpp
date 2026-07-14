@@ -40,6 +40,7 @@ Menu::PendingAction Menu::_pendingAction = Menu::PendingAction::NONE;
 Menu::OperationStatus Menu::_ntpStatus = Menu::OperationStatus::IDLE;
 Menu::OperationStatus Menu::_rtcStatus = Menu::OperationStatus::IDLE;
 uint8_t Menu::_buttonLayoutSelection = BUTTON_MAP;
+bool Menu::_timeZoneChanged = false;
 
 const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
     {0, {{RIGHT_BTN_PIN, Button::RIGHT}, {LEFT_BTN_PIN, Button::LEFT},
@@ -73,6 +74,12 @@ void Menu::handleButtonPress() {
 }
 
 bool Menu::hasPendingAction() const { return _pendingAction != PendingAction::NONE; }
+
+bool Menu::consumeTimeZoneChanged() {
+    const bool changed = _timeZoneChanged;
+    _timeZoneChanged = false;
+    return changed;
+}
 
 void Menu::processPendingAction() {
     if (_pendingAction == PendingAction::NTP_SYNC) {
@@ -204,6 +211,10 @@ void Menu::select() {
     } else if (_mainIndex == 0 && _submenuIndex == 2) {
         _rtcStatus = OperationStatus::STARTED;
         _pendingAction = PendingAction::RTC_CALIBRATION;
+    } else if (_mainIndex == 0 && _submenuIndex == 3) {
+        const bool enabled = _nvs->getInt("auto_dst", AUTO_DST_DEFAULT);
+        _nvs->setInt("auto_dst", !enabled);
+        _timeZoneChanged = true;
     } else if (_mainIndex == 1 && _submenuIndex == 0) {
         toggleAlarm();
     } else if (_mainIndex == 1 && _submenuIndex == 1) {
@@ -261,12 +272,12 @@ void Menu::saveAlarm(uint8_t hour, uint8_t minute) {
 }
 
 uint8_t Menu::submenuSize() const {
-    static constexpr uint8_t sizes[] = {3, 2, 2, 3, 4, 3};
+    static constexpr uint8_t sizes[] = {4, 2, 2, 3, 4, 3};
     return sizes[_mainIndex];
 }
 
 bool Menu::isSubmenuItemSelectable(uint8_t index) const {
-    if (_mainIndex == 0) return index == 0 || index == 2;
+    if (_mainIndex == 0) return index == 0 || index == 2 || index == 3;
     if (_mainIndex == 1) return true;
     if (_mainIndex == 2) return true;
     return false;
@@ -296,7 +307,7 @@ std::string Menu::mainLabel(uint8_t index) {
 
 std::string Menu::submenuLabel(uint8_t index) const {
     static const char *labels[][4] = {
-        {"NTP sync", "schedule", "RTC calib.", ""},
+        {"NTP sync", "schedule", "RTC calib.", "Auto DST"},
         {"Status", "Time", "", ""},
         {"Face", "BTN Layout", "", ""},
         {"SSID", "PASSWORD", "HOSTNAME", ""},
@@ -310,7 +321,8 @@ std::string Menu::submenuValue(uint8_t index) {
     if (_mainIndex == 0) {
         if (index == 0) return statusText(_ntpStatus);
         if (index == 1) return ntpSchedule();
-        return statusText(_rtcStatus);
+        if (index == 2) return statusText(_rtcStatus);
+        return _nvs->getInt("auto_dst", AUTO_DST_DEFAULT) ? "ON" : "OFF";
     }
     if (_mainIndex == 1) {
         if (index == 0) {

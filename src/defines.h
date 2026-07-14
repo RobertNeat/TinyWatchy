@@ -66,6 +66,10 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #error "NTP_SYNC_ENABLED must be 0 or 1"
 #endif
 
+#if AUTO_DST_DEFAULT != 0 && AUTO_DST_DEFAULT != 1
+#error "AUTO_DST_DEFAULT must be 0 or 1"
+#endif
+
 #if NTP_SYNC_HOUR < 0 || NTP_SYNC_HOUR > 23
 #error "NTP_SYNC_HOUR must be between 0 and 23"
 #endif

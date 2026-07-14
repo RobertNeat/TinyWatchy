@@ -17,7 +17,7 @@ Power consumption depends on the selected watch face, interaction frequency, Wi-
 - Time can be synchronized manually from the NTP menu option.
 - Scheduled NTP synchronization is controlled by `NTP_SYNC_ENABLED`, `NTP_SYNC_HOUR`, `NTP_SYNC_DAY1`, and `NTP_SYNC_DAY2`.
 - A successful scheduled synchronization is recorded in NVS to avoid repeating it on the same date.
-- `TIMEZONE` uses the POSIX timezone format and is applied when RTC time is converted for display.
+- The RTC remains in UTC. `TIMEZONE` converts it to local CET/CEST using POSIX rules; `TIME > Auto DST` enables or disables automatic summer-time transitions and defaults to `AUTO_DST_DEFAULT`.
 
 ## User interface
 

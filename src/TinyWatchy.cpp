@@ -78,6 +78,7 @@ void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
                 _accelerometer.getINT();
             }
             _menu.handleButtonPress();
+            if (_menu.consumeTimeZoneChanged()) updateData();
             updateMenu();
             updateBatteryVoltage(); // Update battery only before screen update
             _screen.update(true);
@@ -217,7 +218,8 @@ void TinyWatchy::setupAccelerometer() {
 }
 
 DateTime TinyWatchy::getLocalTime(DateTime time) {
-    setenv("TZ", TIMEZONE, 1);
+    const bool automaticDst = _nvs.getInt("auto_dst", AUTO_DST_DEFAULT);
+    setenv("TZ", automaticDst ? TIMEZONE : TIMEZONE_STANDARD, 1);
     tzset();
 
     time_t tempTime = makeTime((tmElements_t &)time);

@@ -37,6 +37,7 @@ public:
     void handleButtonPress();
     void processPendingAction();
     bool hasPendingAction() const;
+    bool consumeTimeZoneChanged();
 
     std::string getTitle();
     std::string getDescription();
@@ -82,6 +83,7 @@ private:
     RTC_DATA_ATTR static OperationStatus _ntpStatus;
     RTC_DATA_ATTR static OperationStatus _rtcStatus;
     RTC_DATA_ATTR static uint8_t _buttonLayoutSelection;
+    RTC_DATA_ATTR static bool _timeZoneChanged;
     static const std::map<uint8_t, std::map<uint8_t, int>> _buttonMap;
 
     NTP *_ntp;

@@ -7,9 +7,11 @@
 #define WIFI_HOSTNAME "TinyWatchy"
 #define WIFI_TIMEOUT 60000
 
-// POSIX timezone used by setenv("TZ", ...), for example:
-// "CET-1CEST,M3.5.0,M10.5.0/3"
-#define TIMEZONE "GMT"
+// Poland: CET (UTC+1), with automatic CEST (UTC+2) transitions on the last
+// Sunday of March at 02:00 and the last Sunday of October at 03:00.
+#define TIMEZONE "CET-1CEST,M3.5.0/2,M10.5.0/3"
+#define TIMEZONE_STANDARD "CET-1"
+#define AUTO_DST_DEFAULT 1
 
 // Sleep schedule (hours from 0 to 23). Crossing midnight is supported.
 #define SLEEP_START 23
