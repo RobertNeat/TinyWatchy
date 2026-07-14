@@ -4,6 +4,8 @@ TinyWatchy is alternative firmware for the Watchy e-paper watch. It focuses on l
 
 The current hardware configuration supports Watchy V2 with the PCF8563 RTC.
 
+<img width="800" height="600" alt="watchy" src="https://github.com/user-attachments/assets/a32a26e7-cb01-4e0a-9374-955a0ebf0fee" />
+
 ## Features
 
 - Four selectable watch faces: HelloFace, JetBrains, Default, and UwU.
@@ -14,6 +16,8 @@ The current hardware configuration supports Watchy V2 with the PCF8563 RTC.
 - Extensible watch-face and menu-option interfaces.
 
 See [the feature reference](docs/Features.md) for details.
+
+<img width="793" height="595" alt="menu" src="https://github.com/user-attachments/assets/352a5577-db96-43f9-bd50-4104d552a3db" />
 
 ## Setting up the project on a new machine
 
