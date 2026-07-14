@@ -2,7 +2,6 @@
 #if PRIVATE == 1
 #include "Private/AlarmHandlerPrivate.h"
 #endif
-#include "defines_private.h"
 #include "defines.h"
 
 AlarmHandler::AlarmHandler(SmallRTC *smallRTC, BMA423 *accel, bool *accelStatus, ArduinoNvs *nvs) :

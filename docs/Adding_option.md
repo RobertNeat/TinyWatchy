@@ -1,34 +1,55 @@
-# Adding options/features
+# Adding a menu option
 
-Features in TinyWatchy are called options. They're instantiated in the `TinyWatchy.cpp` so you can Dependency Inject anything you need.
+Menu features implement `AbstractOption`. Instances are owned by `Menu` and referenced from its `_pages` structure.
 
-## Base AbstractOption interface
+## Interface
 
-Every watchface **has to** extend `AbstractOption` interface.
+Implement every method in `AbstractOption`:
 
-`AbstractOption` consts of following methods:
-
-- `virtual std::string getTitle() = 0;`: Used to get title of the option. It's supposed to be static. Length is maximum 10 characters.
-- `virtual std::string getDescription(const StackPage& stackPage) = 0;`: Used to get description aka actual information/menu from your feature. This is basically all the output you have. Be concise, maximum 20 characters. StackPage contains property selected which you can use.
-- `virtual void onNextButtonPressed() = 0;`: Handler for next button press. It won't be called unless your option is selected (if you allow such a thing). You can use it to do whatever you like. Can be submenu, doesn't have to be.
-- `virtual void onPrevButtonPressed() = 0;`: As above just button for previous option.
-- `virtual bool onSelectButtonPressed(const StackPage& stackPage) = 0;`: Handler for select button. If you return true, `selected` variable that is provided by `StackPage` will be set to true and `next`/`prev`/`back` handlers will activate. You can return false and just execute simple action like it's done in `NTPOption`
-- `virtual void onBackButtonPressed() = 0;`: Back button handler. It's called only if your option is selected. The user will go back whether you like it or not but you can use it to return description to normal state or cancel pending operation.
-
-What you do inside them is entirely up to you with limitations, don't draw on the screen, don't interrupt too much.
-
-Simplest example option is `MenuOption.h` which simply displays default option and does nothing. `NTPOption` is bit more complicated executing simple action on select. 
-
-## Enabling option
-
-To add your option to the rest of the firmware you need to add it to `Menu`. 
-
-In `Menu.h` add your class as property like 
+```cpp
+class ExampleOption : public AbstractOption {
+public:
+    std::string getTitle() override;
+    std::string getDescription(const StackPage &stackPage) override;
+    void onNextButtonPressed() override;
+    void onPrevButtonPressed() override;
+    bool onSelectButtonPressed(const StackPage &stackPage) override;
+    void onBackButtonPressed() override;
+};
 ```
-    WatchfaceOption _watchfaceOption;
-    DriftOption _driftOption;
-    UiOption _uiOption;
-```
-Then add it somewhere in `_pages`. `_pages` represents the menu structure. You can also add submenu.
 
-If you need some other classes dependency injected, do it in `Menu.cpp` inside `Menu` initializer list.
+- `getTitle()` returns the menu title.
+- `getDescription()` returns the current value, prompt, or status. `StackPage::selected` indicates edit mode.
+- `onNextButtonPressed()` and `onPrevButtonPressed()` are called while the option is selected.
+- `onSelectButtonPressed()` returns `true` to enter selected/edit mode or `false` for an immediate action.
+- `onBackButtonPressed()` lets the option cancel or reset temporary state. `Menu` itself leaves edit mode or returns to the parent page.
+
+Options provide text and behavior; watch faces perform the actual drawing. Keep titles and descriptions short enough for the included faces. The current UI test option can be used to check layout.
+
+## Registration
+
+1. Add the option header, and a `.cpp` file when needed, under `src/MenuOptions/`.
+2. Include it from `src/Menu.h`.
+3. Add an instance as a `Menu` member. Put required dependency pointers in its constructor rather than using globals.
+4. Initialize the instance in the `Menu` constructor initializer list.
+5. Add its address to the appropriate `MenuPage::items` list in `Menu::_pages`.
+
+Example:
+
+```cpp
+ExampleOption _exampleOption;
+
+const MenuPage _pages[3] = {
+    {
+        .items = {
+            &_menuOption,
+            &_ntpOption,
+            &_exampleOption,
+            &_settingsSubmenu,
+        },
+    },
+    // Remaining pages...
+};
+```
+
+Use `SubMenuOption` with a callback to `changePage()` when the feature needs a separate page. If another service is required by the option, pass it through `Menu` from `TinyWatchy` and update the relevant constructors.

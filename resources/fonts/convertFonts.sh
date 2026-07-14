@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 fontconvert="../../.pio/libdeps/esp32dev/Adafruit GFX Library/fontconvert/fontconvert"
 if [ -e "$fontconvert" ]; then
@@ -6,7 +7,7 @@ if [ -e "$fontconvert" ]; then
 else
     echo "fontconvert does not exist, creating it..."
     cd ../../.pio/libdeps/esp32dev/Adafruit\ GFX\ Library/fontconvert/
-    make -j$(nproc)
+    make -j"$(nproc)"
     cd ../../../../../resources/fonts/
     if [ ! -e "$fontconvert" ]; then
         echo "Couldn't compile fontconvert, exiting"

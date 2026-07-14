@@ -28,7 +28,6 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include <GxEPD2_BW.h>
 #include <memory>
 #include "defines.h"
-#include "defines_private.h"
 #include "Screen.h"
 #include "NTP.h"
 #include "Menu.h"

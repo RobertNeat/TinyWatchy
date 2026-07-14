@@ -1,8 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 for f in $(find . -name '*.png');
 do
-    if [[ $f == *".sh"* ]] || [[ $f == *".h"* ]] || [[ $f == "eink-2color.png" ]] || [[ $f == *".txt"* ]]; then
+    if [[ $f == *".sh"* ]] || [[ $f == *".h"* ]] || [[ $f == "./eink_2color.png" ]] || [[ $f == *".txt"* ]]; then
         continue
     fi
 

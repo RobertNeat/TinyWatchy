@@ -134,6 +134,9 @@ uint8_t AlarmSetOption::getModuloForCurrentStep() const {
         case MINUTES_SECOND:
             return 60;
     }
+
+    // RTC-backed state may contain an invalid enum value after memory corruption.
+    return 1;
 }
 
 uint8_t AlarmSetOption::getStepSizeForCurrentStep() const {
@@ -145,6 +148,9 @@ uint8_t AlarmSetOption::getStepSizeForCurrentStep() const {
         case MINUTES_SECOND:
             return 1;
     }
+
+    // Keep alarm editing safe if the retained step value is invalid.
+    return 1;
 }
 
 void AlarmSetOption::loadAlarm() {

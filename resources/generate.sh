@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 rm resources.h 1>/dev/null 2>/dev/null
 touch resources.h

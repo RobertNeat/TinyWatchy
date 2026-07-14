@@ -1,4 +1,6 @@
 .pio
+.vscode/c_cpp_properties.json
+.vscode/launch.json
 resources/images/private
 resources/fonts/private
 src/resources.h
@@ -6,3 +8,5 @@ src/defines_private.h
 src/Faces/Private
 src/MenuOptions/Private
 src/Private
+*.code-workspace
+*.codeworkspace

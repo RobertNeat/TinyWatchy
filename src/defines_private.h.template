@@ -1,44 +1,36 @@
 #ifndef TINYWATCHY_DEFINES_PRIVATE_H
 #define TINYWATCHY_DEFINES_PRIVATE_H
 
+// Wi-Fi configuration
 #define WIFI_SSID ""
 #define WIFI_PASS ""
-#define TIMEZONE "GMT" 
+#define WIFI_HOSTNAME "TinyWatchy"
+#define WIFI_TIMEOUT 60000
 
-#define SLEEP_START 23 //poprawiono przechodzenie przez północ
+// POSIX timezone used by setenv("TZ", ...), for example:
+// "CET-1CEST,M3.5.0,M10.5.0/3"
+#define TIMEZONE "GMT"
+
+// Sleep schedule (hours from 0 to 23). Crossing midnight is supported.
+#define SLEEP_START 23
 #define SLEEP_END 5
 
-/*
- * Automatic time update configuration
- * WAKEUP_INTERVAL_MINUTES: interval for automatic wakeup to update display (during wake hours only)
- */
-#define WAKEUP_INTERVAL_MINUTES 5  // Wake up every 5 minutes to update time display
+// Automatic wake-up interval during active hours. Must be a positive divisor of 60.
+#define WAKEUP_INTERVAL_MINUTES 5
 
-/*
- * Automatic NTP synchronization configuration
- * NTP_SYNC_HOUR must be during wake hours (not between SLEEP_START and SLEEP_END)
- * Days of week: Sunday=1, Monday=2, Tuesday=3, Wednesday=4, Thursday=5, Friday=6, Saturday=7
- */
+// NTP synchronization. Days: Sunday=1, Monday=2, ..., Saturday=7.
+// NTP_SYNC_HOUR should be outside the sleep schedule.
 #define NTP_SYNC_ENABLED 1
-#define NTP_SYNC_HOUR 6  // Hour to perform NTP sync (must be during wake time, after SLEEP_END)
-#define NTP_SYNC_DAY1 2  // Monday
-#define NTP_SYNC_DAY2 5  // Thursday
+#define NTP_SYNC_HOUR 6
+#define NTP_SYNC_DAY1 2
+#define NTP_SYNC_DAY2 5
 
-/*
- * Button map selection. Current options are 0 and 1
- *
- * 0:
- * BACK ------ SELECT
- *      |    |
- *      |    |
- * LEFT ------ RIGHT
- *
- * 1:
- * LEFT ------ RIGHT
- *      |    |
- *      |    |
- * BACK ------ SELECT
- */
+// Button map selection. Current options are 0 and 1.
+//
+// 0:                 1:
+// BACK ---- SELECT   LEFT ---- RIGHT
+//   |        |         |        |
+// LEFT ---- RIGHT    BACK ---- SELECT
 #define BUTTON_MAP 0
 
-#endif //TINYWATCHY_DEFINES_PRIVATE_H
+#endif // TINYWATCHY_DEFINES_PRIVATE_H

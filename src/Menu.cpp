@@ -23,7 +23,6 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "Menu.h"
 #include "buttons.h"
 #include "defines.h"
-#include "defines_private.h"
 #if PRIVATE == 1
 #include "MenuOptions/Private/Include.h"
 #endif

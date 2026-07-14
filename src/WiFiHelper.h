@@ -23,7 +23,6 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 #include <WiFi.h>
 #include "defines.h"
-#include "defines_private.h"
 
 class WiFiHelper {
 public:
