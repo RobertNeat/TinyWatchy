@@ -23,6 +23,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "Faces/JetBrainsFace.h"
 #include "Faces/DefaultFace.h"
 #include "Faces/UwUFace.h"
+#include "resources.h"
 #if PRIVATE == 1
 #include "Faces/Private/Include.h"
 #endif
@@ -42,14 +43,50 @@ void Screen::update(bool partial) {
     _display->setFullWindow();
     _display->fillScreen(GxEPD_WHITE);
 
-    int watchface = _nvs->getInt("watchface", 0);
-    if (watchface >= _faces.size()) {
-        _nvs->setInt("watchface", 0);
-        watchface = 0;
+    if (_screenInfo.onMainOption) {
+        int watchface = _nvs->getInt("watchface", 0);
+        if (watchface < 0 || static_cast<size_t>(watchface) >= _faces.size()) {
+            _nvs->setInt("watchface", 0);
+            watchface = 0;
+        }
+        _faces.at(watchface)->draw(_screenInfo);
+    } else {
+        drawMenu();
     }
-    _faces.at(watchface)->draw(_screenInfo);
 
+    // The white background already replaces the previous frame in the buffer;
+    // keep partial updates enabled so menu navigation remains responsive.
     _display->display(partial);
+}
+
+void Screen::drawMenu() {
+    constexpr int16_t titleCenterY = 82;
+    constexpr int16_t descriptionCenterY = 118;
+
+    _display->setTextColor(GxEPD_BLACK);
+    drawCenteredText(_screenInfo.title, &resources::JETBRAINS_MONO_REGULAR_15, titleCenterY);
+    drawCenteredText(_screenInfo.description, &resources::JETBRAINS_MONO_THIN_10, descriptionCenterY);
+}
+
+void Screen::drawCenteredText(const std::string &text, const GFXfont *font, int16_t centerY) {
+    int16_t x;
+    int16_t y;
+    uint16_t width;
+    uint16_t height;
+    String printable(text.c_str());
+
+    _display->setFont(font);
+    _display->getTextBounds(printable, 0, 0, &x, &y, &width, &height);
+
+    const int16_t cursorX = static_cast<int16_t>(
+        (static_cast<int16_t>(_display->width()) - static_cast<int16_t>(width)) / 2 - x
+    );
+    const int16_t cursorY = static_cast<int16_t>(
+        centerY - static_cast<int16_t>(height) / 2 - y
+    );
+
+    _display->setCursor(cursorX, cursorY);
+    _display->print(printable);
 }
 
 const std::vector<std::unique_ptr<AbstractFace>> &Screen::getFaces() const {

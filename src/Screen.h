@@ -34,6 +34,9 @@ public:
     const std::vector<std::unique_ptr<AbstractFace>>& getFaces() const;
 
 private:
+    void drawMenu();
+    void drawCenteredText(const std::string &text, const GFXfont *font, int16_t centerY);
+
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *_display;
     std::vector<std::unique_ptr<AbstractFace>> _faces;
     const ScreenInfo &_screenInfo;
